@@ -38,6 +38,18 @@ function updateRawcoins()
 		}
 	}
 
+	if (!exchange_get('bitfinex', 'disabled')) {
+		$list = bitfinex_api_query('symbols');
+		if(is_array($list) && !empty($list)) {
+			dborun("UPDATE markets SET deleted=true WHERE name='bitfinex'");
+			foreach ($list as $pair) {
+				if (strpos($pair, 'usd') || !strpos($pair, 'btc')) continue;
+				$symbol = strtoupper(str_replace('btc', '', $pair));
+				updateRawCoin('bitfinex', $symbol);
+			}
+		}
+	}
+
 	if (!exchange_get('bitz', 'disabled')) {
 		$list = bitz_api_query('tickerall');
 		if (!empty($list)) {
@@ -359,14 +371,13 @@ function updateRawcoins()
 	}
 
 	if (!exchange_get('kucoin', 'disabled')) {
-		$list = kucoin_api_query('market/open/coins');
-		if(is_object($list) && isset($list->data) && !empty($list->data))
+		$list = kucoin_api_query('currencies');
+		if(kucoin_result_valid($list) && !empty($list->data))
 		{
 			dborun("UPDATE markets SET deleted=true WHERE name='kucoin'");
 			foreach($list->data as $item) {
-				$symbol = $item->coin;
-				$name = $item->name;
-				if (strpos($item->withdrawRemark,'Ethereum')) continue;
+				$symbol = $item->name;
+				$name = $item->fullName;
 				updateRawCoin('kucoin', $symbol, $name);
 			}
 		}
@@ -400,6 +411,22 @@ function updateRawcoins()
 				$name = trim($item['name']);
 				updateRawCoin('shapeshift', $symbol, $name);
 				//debuglog("shapeshift: $symbol $name");
+			}
+		}
+	}
+
+	if (!exchange_get('tradeogre', 'disabled')) {
+		$list = tradeogre_api_query('markets');
+		if(is_array($list) && !empty($list))
+		{
+			dborun("UPDATE markets SET deleted=true WHERE name='tradeogre'");
+			foreach($list as $ticker) {
+				$symbol_index = key($ticker);
+				$e = explode('-', $symbol_index);
+				if (strtoupper($e[0]) !== 'BTC')
+					continue;
+				$symbol = strtoupper($e[1]);
+				updateRawCoin('tradeogre', $symbol);
 			}
 		}
 	}
@@ -455,6 +482,16 @@ function updateRawCoin($marketname, $symbol, $name='unknown')
 {
 	if($symbol == 'BTC') return;
 
+	// Restrict $symbol and $name to strict defined set of characters (to protect from rogue exchange or DNS attack on exchange)
+	if (preg_match('/[^A-Za-z0-9_\$]/', $symbol)) {
+		debuglog("weird symbol $symbol from $marketname");
+		return;
+		}
+	if (preg_match('/[^A-Za-z0-9_\$ ]/', $name)) {
+		debuglog("weird name $name for symbol $symbol from $marketname");
+		return;
+		}
+
 	$coin = getdbosql('db_coins', "symbol=:symbol", array(':symbol'=>$symbol));
 	if(!$coin && YAAMP_CREATE_NEW_COINS)
 	{
@@ -474,7 +511,7 @@ function updateRawCoin($marketname, $symbol, $name='unknown')
 			}
 		}
 
-		if (in_array($marketname, array('nova','askcoin','binance','bitz','coinexchange','coinsmarkets','cryptobridge','hitbtc'))) {
+		if (in_array($marketname, array('nova','askcoin','binance','bitfinex','bitz','coinexchange','coinsmarkets','cryptobridge','hitbtc'))) {
 			// don't polute too much the db with new coins, its better from exchanges with labels
 			return;
 		}

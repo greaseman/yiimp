@@ -46,6 +46,7 @@ define('YAAMP_USE_NGINX', false);
 define('EXCH_CRYPTOPIA_KEY', '');
 define('EXCH_POLONIEX_KEY', '');
 define('EXCH_BITTREX_KEY', '');
+define('EXCH_BITZ_KEY', '');
 define('EXCH_BLEUTRADE_KEY', '');
 define('EXCH_BTER_KEY', '');
 define('EXCH_YOBIT_KEY', '');
@@ -55,6 +56,7 @@ define('EXCH_CEXIO_KEY', '');
 define('EXCH_COINMARKETS_USER', '');
 define('EXCH_COINMARKETS_PIN', '');
 define('EXCH_CREX24_KEY', '');
+define('EXCH_CRYPTOBRIDGE_ID', '');
 define('EXCH_BINANCE_KEY', '');
 define('EXCH_BITSTAMP_ID','');
 define('EXCH_BITSTAMP_KEY','');
@@ -64,6 +66,7 @@ define('EXCH_KUCOIN_KEY', '');
 define('EXCH_LIVECOIN_KEY', '');
 define('EXCH_NOVA_KEY', '');
 define('EXCH_STOCKSEXCHANGE_KEY', '');
+
 
 // Automatic withdraw to Yaamp btc wallet if btc balance > 0.3
 define('EXCH_AUTO_WITHDRAW', 0.3);

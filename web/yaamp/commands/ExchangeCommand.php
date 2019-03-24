@@ -147,6 +147,12 @@ class ExchangeCommand extends CConsoleCommand
 			if (!is_object($balance)) echo "bittrex error\n";
 			else echo("bittrex btc: ".json_encode($balance->result)."\n");
 		}
+		if (!empty(EXCH_BITZ_KEY) && !empty(EXCH_BITZ_SECRET)) {
+			$bitz = new bitz();
+			$balance = json_decode($bitz->getUserAssets())->data;
+			if (!is_object($balance)) echo "bitz error\n";
+			else echo("bitz btc_total: ".json_encode($balance)."\n");
+		}
 		if (!empty(EXCH_BLEUTRADE_KEY)) {
 			$balance = bleutrade_api_query('account/getbalances','&currencies=BTC');
 			//$balance = bleutrade_api_query('account/getbalances');
@@ -196,8 +202,8 @@ class ExchangeCommand extends CConsoleCommand
 			$balance = kraken_api_user('Balance');
 			echo("kraken btc: ".json_encode($balance)."\n");
 		}
-		if (!empty(EXCH_KUCOIN_KEY)) {
-			$balance = kucoin_api_user('account/BTC/balance');
+		if (!empty(EXCH_KUCOIN_KEY) && !empty(EXCH_KUCOIN_PASSPHRASE)) {
+			$balance = kucoin_api_user('accounts',array('currency'=>'BTC'));
 			if (!is_object($balance) || !isset($balance->data)) echo "kucoin error ".json_encode($balance)."\n";
 			else echo("kucoin: ".json_encode($balance->data)."\n");
 		}

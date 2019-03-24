@@ -2,6 +2,7 @@
 require_once('poloniex_trading.php');
 require_once('binance_trading.php');
 require_once('bittrex_trading.php');
+require_once('bitzv2_trading.php');
 require_once('bleutrade_trading.php');
 require_once('bter_trading.php');
 require_once('c-cex_trading.php');
@@ -10,6 +11,7 @@ require_once('yobit_trading.php');
 require_once('alcurex_trading.php');
 require_once('coinsmarkets_trading.php');
 require_once('crex24_trading.php');
+require_once('cryptobridge_trading.php');
 require_once('cryptopia_trading.php');
 require_once('hitbtc_trading.php');
 require_once('kucoin_trading.php');
@@ -34,6 +36,9 @@ function cancelExchangeOrder($order=false)
 			case 'bittrex':
 				doBittrexCancelOrder($order->uuid);
 				break;
+			case 'bitz':
+				doBitzCancelOrder($order->uuid);
+				break;
 			case 'bleutrade':
 				doBleutradeCancelOrder($order->uuid);
 				break;
@@ -52,7 +57,6 @@ function cancelExchangeOrder($order=false)
 			case 'livecoin':
 				doLiveCoinCancelOrder($order->uuid);
 				break;
-
 		}
 }
 
@@ -88,6 +92,7 @@ function runExchange($exchangeName=false)
 				break;
 
 			case 'cryptobridge':
+				doCryptobridgeTrading(true);
 				updateCryptoBridgeMarkets();
 				break;
 
@@ -99,7 +104,9 @@ function runExchange($exchangeName=false)
 				doBittrexTrading(true);
 				updateBittrexMarkets();
 				break;
+
 			case 'bitz':
+				doBitzTrading(true);
 				updateBitzMarkets();
 				break;
 
@@ -165,6 +172,7 @@ function runExchange($exchangeName=false)
 				doPoloniexTrading(true);
 				updatePoloniexMarkets();
 				break;
+
 
 			default:
 				debuglog(__FUNCTION__.' '.$exchangeName.' not implemented');
